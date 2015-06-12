@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBallAI.AI.SteeringAgents.Helpers;
@@ -11,36 +8,30 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 {
     public class FollowPathBehavior : IBehavior
     {
-        private bool mFinished;
-     
         public FollowPathBehavior()
         {
             WayPointArrivedDistance = 10;
-            mFinished = false;
             Loop = false;
             Weight = 1;
             Probability = 1;
             MaxSpeed = 1;
-            Deceleration = .6f;
             Name = "FollowPath";
-            StopDistance = 1f;
             nodePath = new List<PositionedNode>();
+            tempNodePath = new List<PositionedNode>();
             TargetPosition = new Vector3();
             ReversePathAfterReachingTarget = false;
         }
 
         public List<PositionedNode> nodePath { get; set; }
-        public List<PositionedNode> tempNodePath { get; set; }
+        private List<PositionedNode> tempNodePath { get; set; }
         public float WayPointArrivedDistance { get; set; }
         public bool Loop { get; set; }
         public bool ReversePathAfterReachingTarget { get; set; }
         public int MaxSpeed { get; set; }
-        public float Deceleration { get; set; }
-        public float StopDistance { get; set; }
 
         #region IBehavior Members
 
-        public float Weight{ get; set; }
+        public float Weight { get; set; }
         public float Probability { get; set; }
         public string Name { get; set; }
         public Vector3 TargetPosition { get; set; }
@@ -63,49 +54,25 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
                     }
                 }
 
-                if (nodePath.Count == 1)
-                {
-                    if (Loop == true)
-                    {
-                        mFinished = false;
-                    }
-                    else
-                    {
-                        mFinished = true;
-                    }
-                }
-                else
-                {
-                    mFinished = false;
-                }
-
                 PositionedNode node = nodePath[0];
+                TargetPosition = node.Position;
 
                 //Check if we have reached a waypoint
                 if ((pAgent.Position - node.Position).Length() < WayPointArrivedDistance)
                 {
                     nodePath.RemoveAt(0);
 
-                    //reached the last waypoint, so set velocity to zero
-                    //can still improve this part by making it slows down instead of resetting the speed to zero immediately
+                    //can still improve this part by making it slows down
                     if (nodePath.Count == 0)
                     {
-                        pAgent.Velocity = Vector3.Zero;
+                        //pAgent.Velocity = Vector3.Zero;
+                        return SteeringHelper.Seek(pAgent, TargetPosition, MaxSpeed, WayPointArrivedDistance);
                     }
                 }
                 //it hasn't reached a waypoint, so seek for destination
                 else
                 {
-                    if (mFinished == false)
-                    {
-                        TargetPosition = node.Position;
-                        return SteeringHelper.Seek(pAgent, node.Position, MaxSpeed, StopDistance);
-                    }
-                    else
-                    {
-                        TargetPosition = node.Position;
-                        return SteeringHelper.Arrive(pAgent, node.Position, Deceleration, StopDistance); 
-                    }
+                    return SteeringHelper.Seek(pAgent, TargetPosition, MaxSpeed, WayPointArrivedDistance);
                 }
             }
             else if (nodePath.Count == 0)
@@ -119,10 +86,6 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
                     {
                         nodePath.Reverse(0, nodePath.Count);
                     }
-                }
-                else
-                {
-                    mFinished = true;
                 }
             }
 

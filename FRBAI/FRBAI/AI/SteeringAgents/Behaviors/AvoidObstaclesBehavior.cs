@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FlatRedBall;
+﻿using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBallAI.AI.SteeringAgents.Helpers;
 using FlatRedBall.Math.Geometry;

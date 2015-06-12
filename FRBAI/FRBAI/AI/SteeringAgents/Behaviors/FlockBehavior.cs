@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBallAI.AI.SteeringAgents.Helpers;
@@ -21,14 +18,14 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Weight = 1;
             Probability = 1;
             Name = "Flock";
-            StopDistance = 1f;
+            WayPointArrivedDistance = 1f;
             TargetPosition = new Vector3();
         }
 
         public List<PositionedObject> FlockingAgents { get; set; }
         public float FlockingRadius { get; set; }
         public int MaxSpeed { get; set; }
-        public float StopDistance { get; set; } //distance to stop at the seek destination
+        public float WayPointArrivedDistance { get; set; } //distance to stop at the seek destination
 
         public float SeperationWeight { get; set; }
         public float AlignmentWeight { get; set; }
@@ -52,7 +49,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
                 SteeringForce += SteeringHelper.Seperation(pAgent, Neighbors) * SeperationWeight;
                 SteeringForce += SteeringHelper.Alignment(pAgent, Neighbors) * AlignmentWeight;
-                SteeringForce += SteeringHelper.Cohesion(pAgent, Neighbors, MaxSpeed, StopDistance) * CohesionWeight;
+                SteeringForce += SteeringHelper.Cohesion(pAgent, Neighbors, MaxSpeed, WayPointArrivedDistance) * CohesionWeight;
             }
 
             return SteeringForce;

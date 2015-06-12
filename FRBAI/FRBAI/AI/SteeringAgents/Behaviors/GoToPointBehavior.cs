@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FlatRedBall;
+﻿using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBallAI.AI.SteeringAgents.Helpers;
 
@@ -19,12 +15,12 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Weight = 1;
             Probability = 1;
             Name = "GoToPoint";
-            StopDistance = 1f;
+            WayPointArrivedDistance = 1f;
             TargetPosition = new Vector3();
         }
 
         public float Deceleration { get; set; }
-        public float StopDistance { get; set; } 
+        public float WayPointArrivedDistance { get; set; } 
 
         #region IBehavior Members
 
@@ -35,7 +31,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
-            return SteeringHelper.Arrive(pAgent, mTargetPos, Deceleration, StopDistance);
+            return SteeringHelper.Arrive(pAgent, mTargetPos, Deceleration, WayPointArrivedDistance);
         }
 
         #endregion

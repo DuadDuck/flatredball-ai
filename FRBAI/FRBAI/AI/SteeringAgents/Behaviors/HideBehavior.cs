@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FlatRedBall;
+﻿using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBallAI.AI.SteeringAgents.Helpers;
 using FlatRedBall.Math.Geometry;
@@ -21,7 +17,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Weight = 1;
             Probability = 1;
             Name = "Hide";
-            StopDistance = 1;
+            WayPointArrivedDistance = 1;
             TargetPosition = new Vector3();
         }
 
@@ -30,7 +26,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
         public float BufferSpace { get; set; }
         public float Deceleration { get; set; }
         public float PanicDistance { get; set; }
-        public float StopDistance { get; set; } 
+        public float WayPointArrivedDistance { get; set; } 
 
         #region IBehavior Members
 
@@ -46,7 +42,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             if (CircleObstacles != null && HideFromTarget != null)
             {
                 if(Vector3.Distance(pAgent.Position, HideFromTarget.Position) < PanicDistance)
-                    returnValue += SteeringHelper.Hide(pAgent, HideFromTarget, CircleObstacles, BufferSpace, Deceleration, StopDistance);
+                    returnValue += SteeringHelper.Hide(pAgent, HideFromTarget, CircleObstacles, BufferSpace, Deceleration, WayPointArrivedDistance);
             }
 
             return returnValue;

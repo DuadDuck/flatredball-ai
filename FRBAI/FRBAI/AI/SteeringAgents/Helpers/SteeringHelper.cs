@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBall.Math.Geometry;
-using FlatRedBall.AI.Pathfinding;
 using FlatRedBall.Math;
 
 namespace FlatRedBallAI.AI.SteeringAgents.Helpers
@@ -259,16 +256,16 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pAgent">Source Agent</param>
         /// <param name="pTargetPos">Where to travel to.</param>
         /// <param name="pMaxSpeed">Maximum Speed of source agent.</param>
-        /// <param name="pStopDistance">Distance to stop at the destination</param>
+        /// <param name="pWayPointArrivedDistance">Distance to stop at the destination</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Seek(PositionedObject pAgent, Vector3 pTargetPos, int pMaxSpeed, float pStopDistance)
+        public static Vector3 Seek(PositionedObject pAgent, Vector3 pTargetPos, int pMaxSpeed, float pWayPointArrivedDistance)
         {
             Vector3 DesiredVelocity;
             Vector3 Result;
 
             float distance = Vector3.Distance(pTargetPos, pAgent.Position);
 
-            if (distance > pStopDistance)
+            if (distance > pWayPointArrivedDistance)
             {
                 DesiredVelocity = Vector3.Normalize(pTargetPos - pAgent.Position) * pMaxSpeed;
             }
@@ -310,15 +307,15 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pAgent">Source Agent</param>
         /// <param name="pTargetPos">Where to travel to.</param>
         /// <param name="pDeceleration">How fast to decelerate.  Lower the number, the faster the deceleration
-        /// <param name="pStopDistance">Distance to stop at the destination</param>
+        /// <param name="pWayPointArrivedDistance">Distance to stop at the destination</param>
         /// Suggested: Fast = 0.3, Normal = 0.6, Slow = 0.9</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Arrive(PositionedObject pAgent, Vector3 pTargetPos, float pDeceleration, float pStopDistance)
+        public static Vector3 Arrive(PositionedObject pAgent, Vector3 pTargetPos, float pDeceleration, float pWayPointArrivedDistance)
         {
             //Get the distance
             float dist = Vector3.Distance(pTargetPos, pAgent.Position);
 
-            if (dist > pStopDistance)
+            if (dist > pWayPointArrivedDistance)
             {
                 //Calculate speed to reach using deceleration
                 float speed = dist / pDeceleration;
@@ -343,7 +340,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pTarget">Moving object to pursue.</param>
         /// <param name="pMaxSpeed">Maximum Speed of source agent.</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Pursuit(PositionedObject pAgent, PositionedObject pTarget, int pMaxSpeed, float pStopDistance)
+        public static Vector3 Pursuit(PositionedObject pAgent, PositionedObject pTarget, int pMaxSpeed, float pWayPointArrivedDistance)
         {
             //If just ahead, then just seek
             Vector3 ToTarget = pTarget.Position - pAgent.Position;
@@ -352,7 +349,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
 
             if (Vector3.Dot(ToTarget, pAgent.Velocity) > 0 && RelativeHeading < -0.95)  //acos(0.95) = 18 degs
             {
-                return Seek(pAgent, pTarget.Position, pMaxSpeed, pStopDistance);
+                return Seek(pAgent, pTarget.Position, pMaxSpeed, pWayPointArrivedDistance);
             }
 
 
@@ -364,7 +361,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
             float LookAheadTime = ToTarget.Length() / (pMaxSpeed + pTarget.Velocity.Length());
 
             //Now seek to the predicted future position of the evader
-            return Seek(pAgent, pTarget.Position + pTarget.Velocity * LookAheadTime, pMaxSpeed, pStopDistance);
+            return Seek(pAgent, pTarget.Position + pTarget.Velocity * LookAheadTime, pMaxSpeed, pWayPointArrivedDistance);
         }
 
         /// <summary>
@@ -689,9 +686,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pTarget2">Second target</param>
         /// <param name="pMaxSpeed">Maximum Speed of Source Agent</param>
         /// <param name="pDeceleration">How fast to get there.  See arrive.</param>
-        /// <param name="pStopDistance">Distance to stop at the destination</param>
+        /// <param name="pWayPointArrivedDistance">Distance to stop at the destination</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Interpose(PositionedObject pAgent, PositionedObject pTarget1, PositionedObject pTarget2, int pMaxSpeed, float pDeceleration, float pStopDistance)
+        public static Vector3 Interpose(PositionedObject pAgent, PositionedObject pTarget1, PositionedObject pTarget2, int pMaxSpeed, float pDeceleration, float pWayPointArrivedDistance)
         {
             Vector3 MidPoint = (pTarget1.Position + pTarget2.Position) / 2f;
 
@@ -702,7 +699,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
 
             MidPoint = (Target1NewPos + Target2NewPos) / 2f;
 
-            return Arrive(pAgent, MidPoint, pDeceleration, pStopDistance);
+            return Arrive(pAgent, MidPoint, pDeceleration, pWayPointArrivedDistance);
         }
 
         /// <summary>
@@ -715,9 +712,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pPanicDistance">When evading, this distance determines when to run.  See evade.</param>
         /// <param name="pMaxSpeed">Max speed source agent can travel.</param>
         /// <param name="pDeceleration">How fast to reach hiding spot.  See Arrive.</param>
-        /// <param name="pStopDistance">Distance to stop at the destination</param>
+        /// <param name="pWayPointArrivedDistance">Distance to stop at the destination</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Hide(PositionedObject pAgent, PositionedObject pTarget, PositionedObjectList<Circle> pObstacles, float pHideDistanceFromObstacle, float pDeceleration, float pStopDistance)
+        public static Vector3 Hide(PositionedObject pAgent, PositionedObject pTarget, PositionedObjectList<Circle> pObstacles, float pHideDistanceFromObstacle, float pDeceleration, float pWayPointArrivedDistance)
         {
             float Closest = float.MaxValue;
             Vector3 BestHidingSpot = Vector3.Zero;
@@ -741,7 +738,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                 return Vector3.Zero;
             }
 
-            return Arrive(pAgent, BestHidingSpot, pDeceleration, pStopDistance);
+            return Arrive(pAgent, BestHidingSpot, pDeceleration, pWayPointArrivedDistance);
         }
 
         /// <summary>
@@ -799,7 +796,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pNeighbors">Nearby agents.</param>
         /// <param name="MaxSpeed">Maximum speed source agent can travel.</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Cohesion(PositionedObject pAgent, List<PositionedObject> pNeighbors, int MaxSpeed, float pStopDistance)
+        public static Vector3 Cohesion(PositionedObject pAgent, List<PositionedObject> pNeighbors, int MaxSpeed, float pWayPointArrivedDistance)
         {
             Vector3 CenterOfMass = Vector3.Zero;
             Vector3 SteeringForce = Vector3.Zero;
@@ -813,7 +810,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
             {
                 CenterOfMass /= pNeighbors.Count;
 
-                SteeringForce = Seek(pAgent, CenterOfMass, MaxSpeed, pStopDistance);
+                SteeringForce = Seek(pAgent, CenterOfMass, MaxSpeed, pWayPointArrivedDistance);
             }
 
             return SteeringForce;

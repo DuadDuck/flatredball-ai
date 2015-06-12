@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FlatRedBall;
+﻿using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBallAI.AI.SteeringAgents.Helpers;
 
@@ -19,7 +15,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Weight = 1;
             Probability = 1;
             Name = "OffsetPursuit";
-            StopDistance = 1f;
+            WayPointArrivedDistance = 1f;
             TargetPosition = new Vector3();
         }
 
@@ -27,7 +23,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
         public PositionedObject Target { get; set; }
         public float Deceleration { get; set; }
         public Vector3 Offset { get; set; }
-        public float StopDistance { get; set; } 
+        public float WayPointArrivedDistance { get; set; } 
 
         #region IBehavior Members
 
@@ -47,7 +43,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
             float LookAheadTime = ToOffset.Length() / (float)(MaxSpeed + pAgent.Velocity.Length());
 
-            return SteeringHelper.Arrive(pAgent, WorldOffsetPosition + Target.Velocity * LookAheadTime, Deceleration, StopDistance);
+            return SteeringHelper.Arrive(pAgent, WorldOffsetPosition + Target.Velocity * LookAheadTime, Deceleration, WayPointArrivedDistance);
         }
 
 
